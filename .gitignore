@@ -1,2 +1,3 @@
 *.o
 anneal
+.vscode
