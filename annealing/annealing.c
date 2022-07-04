@@ -2,81 +2,41 @@
 //
 // functions used for simulated annealing.
 
-#include<stdlib.h>
-#include"annealing.h"
+#include <stdlib.h>
+#include "rand.h"
+#include "annealing.h"
 
-sales_problem *make_random_instance(int num_cities, float max_dist) {
-    // make a random instance of the travelling salesman problem.
+void sample_cycle(tour tr, int *cycle, float temp) {
+    // sample the next cycle given current cycle
+    // with known temperature
+    // this function modifies the cycle in-place.
 
-    sales_problem *prob;
-    float rn;
-    
-    prob = malloc(sizeof(sales_problem));
-    prob->num_cities = num_cities;
-    prob->max_distance = max_dist;
-    prob->distance_array = malloc(num_cities * num_cities * sizeof(float));
+    int *new_cycle;
+    float d1, d2, r, p_accept;
 
-    // we must fill in a symmetric matrix. thus, iterate over every row
-    // and only iterate over column values less than it. assign both elements 
-    // in one iteration.
-    for (int i_row = 0; i_row <= (num_cities - 1); i_row++) {
-        for (int j_col = 0; j_col <= i_row; j_col++) {
-            if (i_row != j_col) {
-                rn = prob->max_distance * rand_float();
-                (prob->distance_array)[num_cities * i_row + j_col] = rn;
-                (prob->distance_array)[num_cities * j_col + i_row] = rn;
-            } else {
-                (prob->distance_array)[num_cities * i_row + j_col] = 0.;
-            }
+    // evaluate the difference in cost function
+    // for the current state and one of its neighbors.
+    // copy the current cycle into a new location in memory,
+    // then swap two of its values.
+    new_cycle = malloc(tr.num_cities * sizeof(int));
+    copy_cycle(tr, cycle, new_cycle);
+    swap_two(tr, new_cycle);
+    d1 = tour_distance(tr, cycle);
+    d2 = tour_distance(tr, new_cycle);
 
-            
+    // either accept or reject the new state
+    if (d2 < d1) {
+        // accept the solution!
+        copy_cycle(tr, new_cycle, cycle);
+    } else {
+        // if we draw a number below the acceptance probability,
+        // modify the state.
+        r = rand_float();
+        p_accept = exp(-(d2 - d1) / temp);
+        if (r < p_accept) {
+            copy_cycle(tr, new_cycle, cycle);
         }
     }
 
-    return prob;
-}
-
-int *hamiltonian_cycle(int max) {
-    // make a hamiltonian cycle from 0 to max.
-
-    int randi;
-    int *used, *cycle;
-
-    // generate a hamiltonian cycle over the city indices.
-    // use int values 0 and 1 as bools.
-    used = malloc(max * sizeof(int));
-    cycle = malloc(max * sizeof(int));
-    for (int i = 0; i < max; i++) {
-        // set the flags to all unused
-        used[i] = 0;
-    }
-    for (int i = 0; i < max; i++) {
-        // fill in each element of the cycle
-        while (1) {
-            // generate a random int for next element
-            randi = rand_int(max);
-            // if it is unused, set it to used and break.
-            if (!used[randi]) {
-                used[randi] = 1;
-                break;
-            }
-        }
-        cycle[i] = randi;
-    }
-
-    free(used);
-
-    return cycle;
-}
-
-float cycle_distance(sales_problem *prob, int *cycle) {
-    // return the distance of a cycle.
-
-    float dist = 0.;
-
-    for (int i = 1; i <= prob->num_cities; i++) {
-        dist += distance(prob, cycle[i - 1], cycle[i]);
-    }
-
-    return dist;
+    free(new_cycle);
 }
