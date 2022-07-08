@@ -2,8 +2,8 @@
 //
 // functions related to the tour
 
-#include "tour.h"
 #include <stdio.h>
+#include "tour.h"
 
 point random_point(float x_max, float y_max) {
     // return a random point within the bounds.
@@ -102,6 +102,15 @@ void copy_cycle(tour tr, int *cycle1, int *cycle2) {
     for (int i = 0; i < tr.num_cities; i++) {
         cycle2[i] = cycle1[i];
     }
+}
+
+void print_cycle(tour tr, int *cycle) {
+    // print a cycle to stdout.
+
+    for (int i = 0; i < tr.num_cities; i++) {
+        printf("%d ", cycle[i]);
+    }
+    printf("\n");
 }
 
 float tour_distance(tour tr, int *cycle) {

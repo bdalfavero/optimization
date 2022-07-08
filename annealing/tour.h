@@ -22,4 +22,5 @@ tour make_tour(int num_cities, float x_max, float y_max);
 int *random_cycle(tour tr);
 void swap_two(tour tr, int *cycle);
 void copy_cycle(tour tr, int *cycle1, int *cycle2);
+void print_cycle(tour tr, int *cycle);
 float tour_distance(tour tr, int *cycle);
