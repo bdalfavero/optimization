@@ -1,3 +1,5 @@
 *.o
 anneal
 .vscode
+*.csv
+*.dat
