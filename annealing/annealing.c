@@ -40,3 +40,26 @@ void sample_cycle(tour tr, int *cycle, float temp) {
 
     free(new_cycle);
 }
+
+float linear_temp(float temp, float alpha) {
+    // subtract a constant from the previous temperature.
+
+    return temp - alpha;
+}
+
+float geometric_temp(float temp, float alpha){
+    // multiply the previous temperature by a constant.
+
+    return alpha * temp;
+}
+
+float slow_decrease_temp(float temp, float alpha){
+    // apply slow decrease rule to temperature.
+
+    return temp / (1 + alpha * temp);
+}
+
+annealing_schedule create_schedule(int cycles, int steps, 
+    float (*temp_func)(float, float), float initial_temp, float alpha) {
+    //
+}
